@@ -15,7 +15,7 @@ echo "Running projectatomic/helloapache"
 atomic run projectatomic/helloapache
 
 echo "Checking kubernetes pod"
-kubectl get pod helloapache
+kubectl --server=localhost:80 get pod helloapache
 
 echo "Exiting"
 exit 0
