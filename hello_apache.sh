@@ -13,3 +13,7 @@ EOF
 
 echo "Running projectatomic/helloapache"
 atomic run projectatomic/helloapache
+
+helloapache
+
+exit 0
