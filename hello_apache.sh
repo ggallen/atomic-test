@@ -14,6 +14,8 @@ EOF
 echo "Running projectatomic/helloapache"
 atomic run projectatomic/helloapache
 
+echo "Running helloapache"
 helloapache
 
+echo "Exiting"
 exit 0
