@@ -18,6 +18,7 @@ atomic run projectatomic/helloapache
 #kubectl --server=localhost:80 get pod helloapache
 
 echo "Running curl"
+curl http://localhost/
 
 echo "Exiting"
 exit 0
