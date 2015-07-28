@@ -13,11 +13,11 @@ EOF
 echo "Running projectatomic/helloapache"
 atomic run projectatomic/helloapache
 
+sleep 60
 echo "Checking kubernetes pod"
 kubectl get pod helloapache
 
 # we might need to wait bit, for the app to be running
-sleep 60
 echo "Running curl"
 curl http://localhost/
 
