@@ -40,7 +40,7 @@ systemctl daemon-reload
 rtn_code=0
 for serv in docker etcd kube-apiserver kube-controller-manager kube-scheduler kubelet kube-proxy; do
   service $serv start 
-  rtn=$? ; if [ $rtn -gt $rtn_code]; then rtn_code=$rtn ; fi
+  rtn=$? ; if [ $rtn -gt $rtn_code ]; then rtn_code=$rtn ; fi
 done
 
 if [ $rtn_code -eq 0 ]; then
