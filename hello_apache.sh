@@ -1,6 +1,5 @@
 #!/bin/bash
 
-service docker start
 
 cat << EOF >> answers.conf
 [general]
