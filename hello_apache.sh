@@ -17,7 +17,6 @@ kubectl get pods | egrep -q "^\s+helloapache\s+centos/httpd\s+Running\s+[0-9]"
 while [ $? -ne 0 -a $total -lt 120 ]; do
    sleep 5
    total=$((total+5))
-   echo $total
    kubectl get pods | egrep -q "^\s+helloapache\s+centos/httpd\s+Running\s+[0-9]"
 done
 
@@ -26,7 +25,7 @@ done
 
 # we might need to wait bit, for the app to be running
 echo "Running curl"
-curl http://localhost/ | grep -q 'Apache HTTP Server Test Page powered by CentOS'
+curl http://localhost/ | grep 'Apache HTTP Server Test Page powered by CentOS' >& /dev/null
 ret=$?
 
 echo "Stopping projectatomic/helloapache"
