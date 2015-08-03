@@ -38,16 +38,24 @@ EOF
 systemctl daemon-reload
 
 rtn_code=0
-for serv in docker etcd kube-apiserver kube-controller-manager kube-scheduler kubelet kube-proxy; do
+for serv in kube-proxy kubelet kube-scheduler kube-controller-manager kube-apiserver etcd docker; do
   service $serv start 
   rtn=$? ; if [ $rtn -gt $rtn_code ]; then rtn_code=$rtn ; fi
 done
 
+sleep 5
+
 if [ $rtn_code -eq 0 ]; then
   chmod u+x ./hello_apache.sh
   ./hello_apache.sh
-  if [ $? -ne 0 ]; then
-    echo 'Failed'
-    exit 1
-  fi
+  rtn_code=$?
+fi
+
+for serv in docker etcd kube-apiserver kube-controller-manager kube-scheduler kubelet kube-proxy; do
+  service $serv stop 
+done
+
+if [ $? -ne 0 ]; then
+  echo 'Failed'
+  exit $rtn_code
 fi
