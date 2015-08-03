@@ -1,7 +1,6 @@
 #!/bin/bash
 
-
-cat << EOF >> answers.conf
+cat << EOF > answers.conf
 [general]
 provider = kubernetes
 
@@ -13,13 +12,22 @@ EOF
 echo "Running projectatomic/helloapache"
 atomic run projectatomic/helloapache
 
-sleep 120
-echo "Checking kubernetes pod"
-kubectl get pods
+kubectl get pods | egrep -q "^\s+helloapache\s+centos/httpd\s+Running\s+[0-9]"
+while [ $? -ne 0 ]; do
+   sleep 5
+   kubectl get pods | egrep -q "^\s+helloapache\s+centos/httpd\s+Running\s+[0-9]"
+done
+
+#echo "Checking kubernetes pod"
+#kubectl get pods
 
 # we might need to wait bit, for the app to be running
 echo "Running curl"
-curl http://localhost/
+curl http://localhost/ | grep -q 'Apache HTTP Server Test Page powered by CentOS'
+ret=$?
+
+echo "Stopping projectatomic/helloapache"
+atomic stop projectatomic/helloapache
 
 echo "Exiting"
-exit 0
+exit $ret
