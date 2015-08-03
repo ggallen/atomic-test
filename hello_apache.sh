@@ -14,7 +14,7 @@ atomic run projectatomic/helloapache
 
 total=0
 kubectl get pods | egrep -q "^\s+helloapache\s+centos/httpd\s+Running\s+[0-9]"
-while [ $? -ne 0 && $total -lt 120 ]; do
+while [ $? -ne 0 && total -lt 120 ]; do
    sleep 5
    total=total+5
    kubectl get pods
