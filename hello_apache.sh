@@ -15,6 +15,7 @@ atomic run projectatomic/helloapache
 kubectl get pods | egrep -q "^\s+helloapache\s+centos/httpd\s+Running\s+[0-9]"
 while [ $? -ne 0 ]; do
    sleep 5
+   kubectl get pods
    kubectl get pods | egrep -q "^\s+helloapache\s+centos/httpd\s+Running\s+[0-9]"
 done
 
