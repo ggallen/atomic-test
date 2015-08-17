@@ -55,7 +55,7 @@ for serv in docker etcd kube-apiserver kube-controller-manager kube-scheduler ku
   service $serv stop 
 done
 
-if [ $? -ne 0 ]; then
+if [ $rtn_code -ne 0 ]; then
   echo 'Failed'
-  exit $rtn_code
 fi
+exit $rtn_code
