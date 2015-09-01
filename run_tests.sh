@@ -1,59 +1,31 @@
 #!/bin/bash
 
+source functions.sh $*
+
 echo 'Yum updating the host' 
 yum -y -d0 upgrade
 
 echo 'Installing atomic'
 yum -y -d 1  install atomic kubernetes etcd flannel
 
-#Fixing issue #29
-cat << EOF > /etc/systemd/system/kube-apiserver.service
-[Unit]
-Description=Kubernetes API Server
-Documentation=https://github.com/GoogleCloudPlatform/kubernetes
-After=network.target
+echo 'Configuring kubernetes'
+key_dir="/etc/pki/kube-apiserver"
+key_file="$key_dir/serviceaccount.key"
+mkdir -p $key_dir
+/bin/openssl genrsa -out $key_file 2048
+sed -i -e "s%KUBE_API_ARGS=\".*\"%KUBE_API_ARGS=\"--service_account_key_file=$key_file\"%" /etc/kubernetes/apiserver
+sed -i -e "s%KUBE_CONTROLLER_MANAGER_ARGS=\".*\"%KUBE_API_ARGS=\"--service_account_private_key_file=$key_file\"%" /etc/kubernetes/controller-manager
 
-[Service]
-EnvironmentFile=-/etc/kubernetes/config
-EnvironmentFile=-/etc/kubernetes/apiserver
-User=kube
-ExecStart=/usr/bin/kube-apiserver \\
-            \$KUBE_LOGTOSTDERR \\
-            \$KUBE_LOG_LEVEL \\
-            \$KUBE_ETCD_SERVERS \\
-            \$KUBE_API_ADDRESS \\
-            \$KUBE_API_PORT \\
-            \$KUBELET_PORT \\
-            \$KUBE_ALLOW_PRIV \\
-            \$KUBE_SERVICE_ADDRESSES \\
-            \$KUBE_ADMISSION_CONTROL \\
-            \$KUBE_API_ARGS
-Restart=on-failure
-LimitNOFILE=65536
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl daemon-reload
-
-rtn_code=0
-for serv in kube-proxy kubelet kube-scheduler kube-controller-manager kube-apiserver etcd docker; do
-  service $serv start 
-  rtn=$? ; if [ $rtn -gt $rtn_code ]; then rtn_code=$rtn ; fi
-done
-
-sleep 5
+startup
+rtn_code=$?
 
 if [ $rtn_code -eq 0 ]; then
   chmod u+x ./hello_apache.sh
-  ./hello_apache.sh
+  ./hello_apache.sh -p $provider
   rtn_code=$?
 fi
 
-for serv in docker etcd kube-apiserver kube-controller-manager kube-scheduler kubelet kube-proxy; do
-  service $serv stop 
-done
+shutdown
 
 if [ $rtn_code -ne 0 ]; then
   echo 'Failed'
