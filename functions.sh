@@ -3,15 +3,14 @@
 docker_services="etcd docker"
 kubernetes_services="kube-proxy kubelet kube-scheduler kube-controller-manager kube-apiserver $docker_services"
 
-provider="docker"
-services="$docker_services"
+providers="docker"
 
 function parse_opts {
     local OPTIND opt p
     while getopts "p:" opt; do
         case $opt in
         p)
-            provider="$OPTARG"
+            providers="$OPTARG"
             ;;
         esac
    done
@@ -19,26 +18,51 @@ function parse_opts {
    shift $((OPTIND - 1))
 }
 
-function startup {
-    if [ "$provider" = "docker" ]; then
-        services="$docker_services"
-    elif [ "$provider" = "kubernetes" ]; then
-        services="$kubernetes_services"
+function configure() {
+    local prov=$1
+    if [ "$prov" = "docker" ]; then
+        :
+    elif [ "$prov" = "kubernetes" ]; then
+        key_dir="/etc/pki/kube-apiserver"
+        key_file="$key_dir/serviceaccount.key"
+        mkdir -p $key_dir
+        /bin/openssl genrsa -out $key_file 2048
+        sed -i -e "s%KUBE_API_ARGS=\".*\"%KUBE_API_ARGS=\"--service_account_key_file=$key_file\"%" /etc/kubernetes/apiserver
+        sed -i -e "s%KUBE_CONTROLLER_MANAGER_ARGS=\".*\"%KUBE_CONTROLLER_MANAGER_ARGS=\"--service_account_private_key_file=$key_file\"%" /etc/kubernetes/controller-manager
+
         fix_kubernetes_issue_29
     else
-        echo "Unknown provider '$provider'"
+        echo "Unknown provider '$prov'"
         exit 1 
     fi
-    shutdown
-    start_services
 }
 
-function shutdown {
+function get_services() {
+    local prov=$1
+    if [ "$prov" = "docker" ]; then
+        echo "$docker_services"
+    elif [ "$prov" = "kubernetes" ]; then
+        echo "$kubernetes_services"
+    else
+        echo "Unknown provider '$prov'"
+        exit 1 
+    fi
+}
+
+function startup() {
+    local prov=$1
+    shutdown $prov
+    start_services $(get_services $prov)
+}
+
+function shutdown() {
+    local prov=$1
     rm -rf .workdir Dockerfile Nulecule answers.conf artifacts
-    stop_services
+    stop_services $(get_services $prov)
 }
 
-function start_services {
+function start_services() {
+    local services=$*
     rtn_code=0
     for s in $services; do
         service $s start
@@ -51,8 +75,9 @@ function start_services {
     return $rtn_code
 }
 
-function stop_services {
-    for s in $services; do
+function stop_services() {
+    local services=$*
+    for s in `echo $services | awk '{ for (i=NF; i>0; --i) printf("%s%s", $i, (i>1?OFS:ORS))}'`; do
         service $s stop
     done
     return 0

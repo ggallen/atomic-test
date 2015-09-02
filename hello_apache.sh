@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source functions.sh
+provider=$1
 
 cat << EOF > answers.conf
 [general]
@@ -34,7 +34,6 @@ if [ $ret -eq 0 ]; then
         kubectl get pods
     fi
 
-    # we might need to wait bit, for the app to be running
     echo "Running curl"
     curl http://localhost/ | grep 'Apache HTTP Server Test Page powered by CentOS' >& /dev/null
     res=$?
