@@ -14,7 +14,7 @@ key_file="$key_dir/serviceaccount.key"
 mkdir -p $key_dir
 /bin/openssl genrsa -out $key_file 2048
 sed -i -e "s%KUBE_API_ARGS=\".*\"%KUBE_API_ARGS=\"--service_account_key_file=$key_file\"%" /etc/kubernetes/apiserver
-sed -i -e "s%KUBE_CONTROLLER_MANAGER_ARGS=\".*\"%KUBE_API_ARGS=\"--service_account_private_key_file=$key_file\"%" /etc/kubernetes/controller-manager
+sed -i -e "s%KUBE_CONTROLLER_MANAGER_ARGS=\".*\"%KUBE_CONTROLLER_MANAGER_ARGS=\"--service_account_private_key_file=$key_file\"%" /etc/kubernetes/controller-manager
 
 startup
 rtn_code=$?
