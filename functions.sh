@@ -117,3 +117,25 @@ EOF
 }
 
 parse_opts $*
+
+function install_packages() {
+
+    echo 'Yum updating the host'
+    yum -y -d0 upgrade
+
+    echo 'Installing atomic'
+    yum -y -d 1  install atomic kubernetes etcd flannel mariadb redis
+
+    rpm -qa | egrep -q '^redis'
+    if [ $? -ne 0 ]; then
+        back=`pwd`
+        echo 'Installing redis'
+        mkdir /tmp/redis.$$
+        cd /tmp/redis.$$
+        yum -y -d 1  install wget   
+        wget -r --no-parent -A 'epel-release-*.rpm' http://dl.fedoraproject.org/pub/epel/7/x86_64/e/
+        rpm -Uvh dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-*.rpm
+        yum -y -d 1  install redis   
+        cd $back
+        fi
+}
