@@ -148,6 +148,6 @@ function install_packages() {
     fi
 
     echo 'Patching atomic stop.'
-    yum -y -d 1 patch
+    yum -y -d 1 install patch
     patch -N -p 0 -u /usr/lib/python2.7/site-packages/Atomic/atomic.py < 2748df6.patch
 }
