@@ -4,13 +4,17 @@ docker_services="etcd docker"
 kubernetes_services="kube-proxy kubelet kube-scheduler kube-controller-manager kube-apiserver $docker_services"
 
 providers="docker"
+tests="hello_apache.sh"
 
 function parse_opts {
     local OPTIND opt p
     while getopts "p:" opt; do
         case $opt in
         p)
-            providers="$OPTARG"
+            providers=`echo $OPTARG | tr ',' ' '`
+            ;;
+        t)
+            tests="$OPTARG"
             ;;
         esac
    done
@@ -55,9 +59,13 @@ function startup() {
     start_services $(get_services $prov)
 }
 
+function cleanup() {
+    rm -rf .workdir Dockerfile Nulecule answers.conf artifacts
+}
+
 function shutdown() {
     local prov=$1
-    rm -rf .workdir Dockerfile Nulecule answers.conf artifacts
+    cleanup
     stop_services $(get_services $prov)
 }
 
@@ -124,7 +132,7 @@ function install_packages() {
     yum -y -d0 upgrade
 
     echo 'Installing atomic'
-    yum -y -d 1  install atomic kubernetes etcd flannel mariadb redis
+    yum -y -d 1 install atomic kubernetes etcd flannel mariadb redis
 
     rpm -qa | egrep -q '^redis'
     if [ $? -ne 0 ]; then
@@ -137,5 +145,9 @@ function install_packages() {
         rpm -Uvh dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-*.rpm
         yum -y -d 1  install redis   
         cd $back
-        fi
+    fi
+
+    echo 'Patching atomic stop.'
+    yum -y -d 1 patch
+    patch -N -p 0 -u /usr/lib/python2.7/site-packages/Atomic/atomic.py < 2748df6.patch
 }
