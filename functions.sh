@@ -8,7 +8,7 @@ tests="hello_apache.sh"
 
 function parse_opts {
     local OPTIND opt p
-    while getopts "p:" opt; do
+    while getopts "p:t:" opt; do
         case $opt in
         p)
             providers=`echo $OPTARG | tr ',' ' '`
