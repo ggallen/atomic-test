@@ -35,7 +35,7 @@ if [ $ret -eq 0 ]; then
         echo "Checking kubernetes pod"
         kubectl get pods
 
-        host=`kubectl get service | egrep '^mariadb' | awk '{print $4}'`
+        host=`kubectl get service mariadb | egrep '^mariadb' | awk '{print $4}'`
     fi
 
     sleep 3
