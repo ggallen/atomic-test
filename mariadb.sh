@@ -22,22 +22,25 @@ if [ $res -gt $ret ]; then
 fi
 
 if [ $ret -eq 0 ]; then
-#    if [ "$provider" = "kubernetes" ]; then
-#        total=0
-#        kubectl get pods | egrep -q "^\s+helloapache\s+centos/httpd\s+Running\s+[0-9]"
-#        while [ $? -ne 0 -a $total -lt 120 ]; do
-#           sleep 5
-#           total=$((total+5))
-#           kubectl get pods | egrep -q "^\s+helloapache\s+centos/httpd\s+Running\s+[0-9]"
-#        done
-#
-#        echo "Checking kubernetes pod"
-#        kubectl get pods
-#    fi
+    host="0.0.0.0"
+    if [ "$provider" = "kubernetes" ]; then
+        total=0
+        kubectl get pods | egrep -q "^mariadb\s+.*\s+Running\s+"
+        while [ $? -ne 0 -a $total -lt 120 ]; do
+           sleep 2
+           total=$((total+2))
+           kubectl get pods | egrep -q "^mariadb\s+.*\s+Running\s+"
+        done
+
+        echo "Checking kubernetes pod"
+        kubectl get pods
+
+        host=`kubectl get service | egrep '^mariadb' | awk '{print $4}'`
+    fi
 
     sleep 3
     echo "Checking databases"
-    mysql --host 0.0.0.0 --user=username --password=password --execute="show databases;"
+    mysql --host $host --user=username --password=password --execute="show databases;"
     res=$?
     if [ $res -gt $ret ]; then
         ret=$res
