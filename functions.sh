@@ -14,7 +14,7 @@ function parse_opts {
             providers=`echo $OPTARG | tr ',' ' '`
             ;;
         t)
-            tests="$OPTARG"
+            tests=`echo $OPTARG | tr ',' ' '`
             ;;
         esac
    done
