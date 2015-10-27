@@ -60,12 +60,18 @@ function startup() {
 }
 
 function cleanup() {
+    local prov=$1
+    if [ "$prov" = "docker" ]; then
+        if [ `docker ps -aq | wc -l` -gt 0 ]; then
+            docker rm $(docker ps -aq)
+        fi
+    fi
     rm -rf .workdir Dockerfile Nulecule answers.conf artifacts
 }
 
 function shutdown() {
     local prov=$1
-    cleanup
+    cleanup $prov
     stop_services $(get_services $prov)
 }
 

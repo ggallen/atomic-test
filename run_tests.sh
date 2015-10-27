@@ -30,7 +30,7 @@ for provider in $providers; do
             job_rtn=$rtn_code
         fi
     
-        cleanup
+        cleanup $provider
     done
 
     shutdown $provider

@@ -76,7 +76,7 @@ if [ $ret -eq 0 ]; then
     times=0
     redis-cli -h $host -p $port ping
     while [ $? -ne 0 -a $times -lt 3 ]; do
-        total=$((times+1))
+        times=$((times+1))
         redis-cli -h $host -p $port ping
     done
 
