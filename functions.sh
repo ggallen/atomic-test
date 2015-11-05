@@ -65,6 +65,9 @@ function cleanup() {
         if [ `docker ps -aq | wc -l` -gt 0 ]; then
             docker rm $(docker ps -aq)
         fi
+        if [ `docker images -aq | wc -l` -gt 0 ]; then
+            docker rmi $(docker images -aq)
+        fi
     fi
     rm -rf .workdir Dockerfile Nulecule answers.conf artifacts
 }
