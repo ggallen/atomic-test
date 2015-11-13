@@ -156,6 +156,14 @@ function install_packages() {
         cd $back
     fi
 
+    echo 'writing out atomicapp executable'
+    cat <<'EOF' > /usr/local/bin/atomicapp
+#!/bin/bash
+docker run -it --rm  --privileged -v $(pwd):/atomicapp -v /run:/run -v /:/host --net=host --name atomicapp projectatomic/atomicapp:dev $@
+EOF
+    chmod 755 /usr/local/bin/atomicapp
+
+
     echo 'Patching atomic stop.'
     yum -y -d 1 install patch
     patch -N -p 0 -u /usr/lib/python2.7/site-packages/Atomic/atomic.py < 2748df6.patch

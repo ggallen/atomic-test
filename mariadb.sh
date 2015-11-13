@@ -15,7 +15,7 @@ EOF
 ret=0
 
 echo "Running projectatomic/mariadb-centos7-atomicapp"
-atomic run projectatomic/mariadb-centos7-atomicapp
+atomicapp run --destination=./ projectatomic/mariadb-centos7-atomicapp
 res=$?
 if [ $res -gt $ret ]; then
     ret=$res
@@ -57,7 +57,7 @@ if [ $ret -eq 0 ]; then
 fi
 
 echo "Stopping projectatomic/mariadb-centos7-atomicapp"
-atomic stop projectatomic/mariadb-centos7-atomicapp
+atomicapp stop ./
 res=$?
 if [ $res -gt $ret ]; then
     ret=$res
