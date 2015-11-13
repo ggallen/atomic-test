@@ -14,7 +14,7 @@ EOF
 ret=0
 
 echo "Running projectatomic/helloapache"
-atomic run projectatomic/helloapache
+atomicapp run --destination=./ projectatomic/helloapache
 res=$?
 if [ $res -gt $ret ]; then
     ret=$res
@@ -49,7 +49,7 @@ if [ $ret -eq 0 ]; then
 fi
 
 echo "Stopping projectatomic/helloapache"
-atomic stop projectatomic/helloapache
+atomicapp stop ./
 res=$?
 if [ $res -gt $ret ]; then
     ret=$res

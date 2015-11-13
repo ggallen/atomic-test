@@ -20,7 +20,7 @@ EOF
 ret=0
 
 echo "Running projectatomic/redis-centos7-atomicapp"
-atomic run projectatomic/redis-centos7-atomicapp
+atomicapp run --destination=./ projectatomic/redis-centos7-atomicapp
 res=$?
 if [ $res -gt $ret ]; then
     ret=$res
@@ -89,7 +89,7 @@ if [ $ret -eq 0 ]; then
 fi
 
 echo "Stopping projectatomic/redis-centos7-atomicapp"
-atomic stop projectatomic/redis-centos7-atomicapp
+atomicapp stop ./
 res=$?
 if [ $res -gt $ret ]; then
     ret=$res
