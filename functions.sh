@@ -68,6 +68,8 @@ function cleanup() {
         if [ `docker images -aq | wc -l` -gt 0 ]; then
             docker rmi $(docker images -aq)
         fi
+    elif [ "$prov" = "kubernetes" ]; then
+        kubectl delete rc --all
     fi
     rm -rf .workdir Dockerfile Nulecule answers.conf artifacts
 }

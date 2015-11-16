@@ -50,11 +50,9 @@ if [ $ret -eq 0 ]; then
         port=`docker ps | egrep "redis-master" | sed -e "s/.*0.0.0.0://" -e "s/->.*//"`
     elif [ "$provider" = "kubernetes" ]; then
         total=0
-        kubectl get pods | egrep -q "^redis-master-.*\s+Running\s+"
-        while [ $? -ne 0 -a $total -lt 120 ]; do
+        while [ `kubectl get pods | egrep -c "^redis-(master|slave)-.*1/1\s+Running\s+"` -ne 3 -a $total -lt 120 ]; do
             sleep 2
             total=$((total+2))
-            kubectl get pods | egrep -q "^redis-master-.*\s+Running\s+"
         done
 
         echo "Checking kubernetes pod"
@@ -63,9 +61,8 @@ if [ $ret -eq 0 ]; then
         echo "Checking kubernetes services"
         kubectl get services
 
-        kubectl get pods | egrep -q "^redis-master-.*\s+Running\s+"
-        res=$?
-        if [ $res -gt $ret ]; then
+        count=`kubectl get pods | egrep -c "^redis-(master|slave)-.*1/1\s+Running\s+"`
+        if [ $count -ne 3 -a 1 -gt $ret ]; then
             ret=$res
         fi
         host=`kubectl get services | egrep "^redis-master" | awk '{print $(NF-1)}'`

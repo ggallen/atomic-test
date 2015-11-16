@@ -25,11 +25,11 @@ if [ $ret -eq 0 ]; then
     host="0.0.0.0"
     if [ "$provider" = "kubernetes" ]; then
         total=0
-        kubectl get pods | egrep -q "^mariadb\s+.*\s+Running\s+"
+        kubectl get pods | egrep -q "^mariadb\s+1/1\s+Running\s+"
         while [ $? -ne 0 -a $total -lt 120 ]; do
            sleep 2
            total=$((total+2))
-           kubectl get pods | egrep -q "^mariadb\s+.*\s+Running\s+"
+           kubectl get pods | egrep -q "^mariadb\s+1/1\s+Running\s+"
         done
 
         echo "Checking kubernetes pod"
