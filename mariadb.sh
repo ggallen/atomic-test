@@ -43,9 +43,7 @@ if [ $ret -eq 0 ]; then
     mysql --host $host --user=username --password=password --execute="show databases;" --connect-timeout=5
     ret=$?
     while [ $ret -ne 0 -a $times -lt 25 ]; do
-        if [ "$provider" = "docker" ]; then
-            sleep 3
-        fi
+        sleep 3
         times=$((times+1))
         mysql --host $host --user=username --password=password --execute="show databases;" --connect-timeout=5
         ret=$?
